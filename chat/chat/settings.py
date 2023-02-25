@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-0vm00zxxk%_url)y7lvl)i-b5#6fzzh4-3kyr-)dnp#sjkuoj7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.0.104',
+                 '127.0.0.1',]
 
 
 # Application definition
@@ -39,6 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'chat_api',
+    'corsheaders',
+    'djoser',
+    'rest_framework.authtoken',
+    'channels',
 ]
 
 
@@ -50,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 REST_FRAMEWORK = {
@@ -57,8 +63,14 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'chat.urls'
 
