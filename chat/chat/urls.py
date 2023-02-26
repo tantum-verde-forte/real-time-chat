@@ -8,8 +8,8 @@ from rest_framework_simplejwt.views import (
 )
 
 router = routers.DefaultRouter()
-router.register(r'api/users', views.UserViewSet)
-router.register(r'api/groups', views.GroupViewSet)
+router.register(r'api/message', views.MessageViewSet)
+
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
