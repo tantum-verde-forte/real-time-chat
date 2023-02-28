@@ -7,6 +7,10 @@ from chat_api.serializers import MessageSerializer
 from datetime import datetime
 from rest_framework.decorators import api_view
 
+
+def lobby(request):
+    return render(request, 'chat/lobby.html')
+
 class MessageViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
