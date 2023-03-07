@@ -1,23 +1,23 @@
-from django.shortcuts import render
-
-from chat_api.models import Message
-from rest_framework import viewsets
-from rest_framework import permissions
-from chat_api.serializers import MessageSerializer
-from datetime import datetime
-from rest_framework.decorators import api_view
+from asgiref.sync import sync_to_async
+from django.shortcuts import render, reverse, get_object_or_404
+from django.views.generic import TemplateView
+from django.http import HttpResponseRedirect
+from .models import Room, Message
 
 
-def lobby(request):
-    return render(request, 'chat/lobby.html')
+def index(request):
+    if request.method == "POST":
+        name = request.POST.get("name", None)
+        if name:
+            room = Room.objects.create(name=name, host=request.user)
+            print(room.pk)
+            return HttpResponseRedirect(reverse("room", kwargs={"pk": room.pk}))
+    return render(request, 'chat/index.html')
 
-class MessageViewSet(viewsets.ModelViewSet):
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
+def room(request, pk):
+    room: Room = get_object_or_404(Room, pk=pk)
+    return render(request, 'chat/room.html', {
+        "room": room,
+    })
 
