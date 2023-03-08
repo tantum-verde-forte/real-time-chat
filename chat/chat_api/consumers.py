@@ -3,7 +3,9 @@ from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 import json
 from datetime import datetime
+from django.forms.models import model_to_dict
 
+from django.core import serializers
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
@@ -18,7 +20,6 @@ from .serializers import MessageSerializer, RoomSerializer, UserSerializer
 
 class RoomConsumer(WebsocketConsumer):
 
-    Messages = posts = Message.objects.all()
 
     def connect(self):
         self.room_name = '1'
@@ -29,6 +30,7 @@ class RoomConsumer(WebsocketConsumer):
         )
 
         self.accept()
+        self.get_messages()
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
@@ -40,8 +42,7 @@ class RoomConsumer(WebsocketConsumer):
         message = text_data_json["message"]
         pk = text_data_json["pk"]
 
-        b = Message(room=Room.objects.get(pk=pk), text=message, user=self.user)
-        async_to_sync(b.save())
+        self.create_message(Room.objects.get(pk=pk), message)
 
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name, {"type": "chat_message", "message": message}
@@ -49,5 +50,14 @@ class RoomConsumer(WebsocketConsumer):
 
     def chat_message(self, event):
         message = event["message"]
-        self.send(text_data=json.dumps({"message": message, "user": self.scope['user'].username, "date": str(datetime.now().time())}))
+        self.send(text_data=json.dumps({"message": message, "user": self.scope['user'].username, "date": str(datetime.now())}))
 
+    def create_message(self, room, text):
+        message = Message(room=room, text=text, user=self.user)
+        async_to_sync(message.save())
+
+    def get_messages(self):
+        messages = Message.objects.all()
+        messages_json = json.dumps(MessageSerializer(messages, many=True).data)
+        self.send(text_data=messages_json)
+        print(messages_json)

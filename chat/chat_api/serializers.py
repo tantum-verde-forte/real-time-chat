@@ -7,29 +7,20 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = settings.AUTH_USER_MODEL
-        fields = ["id", "username", "email", "password"]
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ["username"]
 
-    def create(self, validated_data):
-        user = settings.AUTH_USER_MODEL(
-            email=validated_data['email'],
-            username=validated_data['username']
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    created_at_formatted = serializers.SerializerMethodField()
-    user = UserSerializer()
+    created_at = serializers.SerializerMethodField()
+    user = serializers.StringRelatedField()
 
     class Meta:
         model = Message
-        exclude = []
+        fields = ["text", "user", "created_at"]
         depth = 1
 
-    def get_created_at_formatted(self, obj: Message):
+    def get_created_at(self, obj: Message):
         return obj.created_at.strftime("%d-%m-%Y %H:%M:%S")
 
 
