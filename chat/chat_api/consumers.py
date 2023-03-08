@@ -22,9 +22,11 @@ class RoomConsumer(WebsocketConsumer):
 
 
     def connect(self):
-        self.room_name = '1'
-        self.room_group_name = "chat_%s" % self.room_name
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.room_pk = Room.objects.get(name=self.room_name).pk
+        self.room_group_name = 'chat_%s' % self.room_name
         self.user = self.scope["user"]
+
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
         )
@@ -40,9 +42,8 @@ class RoomConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
-        pk = text_data_json["pk"]
 
-        self.create_message(Room.objects.get(pk=pk), message)
+        self.create_message(Room.objects.get(pk=self.room_pk), message)
 
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name, {"type": "chat_message", "message": message}
@@ -57,7 +58,6 @@ class RoomConsumer(WebsocketConsumer):
         async_to_sync(message.save())
 
     def get_messages(self):
-        messages = Message.objects.all()
+        messages = Message.objects.filter(room=self.room_pk)
         messages_json = json.dumps(MessageSerializer(messages, many=True).data)
         self.send(text_data=messages_json)
-        print(messages_json)
