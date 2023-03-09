@@ -51,7 +51,7 @@ class RoomConsumer(WebsocketConsumer):
 
     def chat_message(self, event):
         message = event["message"]
-        self.send(text_data=json.dumps({"message": message, "user": self.scope['user'].username, "date": str(datetime.now())}))
+        self.send_last_message()
 
     def create_message(self, room, text):
         message = Message(room=room, text=text, user=self.user)
@@ -60,4 +60,9 @@ class RoomConsumer(WebsocketConsumer):
     def get_messages(self):
         messages = Message.objects.filter(room=self.room_pk)
         messages_json = json.dumps(MessageSerializer(messages, many=True).data)
+        self.send(text_data=messages_json)
+
+    def send_last_message(self):
+        message = Message.objects.latest('id', 'text', 'user', 'created_at', 'room')
+        messages_json = json.dumps(MessageSerializer(message).data)
         self.send(text_data=messages_json)

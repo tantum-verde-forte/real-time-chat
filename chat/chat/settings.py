@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-0vm00zxxk%_url)y7lvl)i-b5#6fzzh4-3kyr-)dnp#sjkuoj7
 DEBUG = True
 
 ALLOWED_HOSTS = ['192.168.0.104',
-                 '127.0.0.1',]
+                 '127.0.0.1',
+                 '78.106.95.182',
+                 '*']
 
 
 # Application definition
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
     'rest_framework.authtoken',
+    'sslserver',
 ]
 
 ASGI_APPLICATION = 'chat.asgi.application'
