@@ -12,18 +12,21 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0vm00zxxk%_url)y7lvl)i-b5#6fzzh4-3kyr-)dnp#sjkuoj7'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG_FLAG")
 
 ALLOWED_HOSTS = ['192.168.0.104',
                  '127.0.0.1',
@@ -152,12 +155,12 @@ WSGI_APPLICATION = 'chat.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'chat_django1',
-        'USER': 'mysql',
-        'PASSWORD': 'mysql',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("DJANGO_DATABASE_NAME"),
+        'USER': os.getenv("DJANGO_DATABASE_USER"),
+        'PASSWORD': os.getenv("DJANGO_SECRET_KEY"),
+        'HOST': os.getenv("DJANGO_DATABASE_USER_PASSWORD"),
+        'PORT': '5432',
     }
 }
 
